@@ -8,14 +8,14 @@ template <int N>
 void require_exactly(std::vector<Object *> const &args)
 {
 	if (args.size() != N)
-		throw std::exception("Wrong number of arguments");
+		throw std::runtime_error("Wrong number of arguments");
 }
 
 template <int N>
 void require_atleast(std::vector<Object *> const &args)
 {
 	if (args.size() < N)
-		throw std::exception("Not enough arguments");
+		throw std::runtime_error("Not enough arguments");
 }
 
 struct Lambda : public Procedure
@@ -36,7 +36,7 @@ struct Lambda : public Procedure
 			Object *val = argNames->list_ref(i);
 			if (val->type != &Symbol_Type)
 			{
-				throw std::exception("Parse error for lamba args");
+				throw std::runtime_error("Parse error for lamba args");
 			}
 			Symbol *argName = (Symbol *)val;
 			newEnv->set(argName->name, args[i]);
@@ -57,7 +57,7 @@ struct Add : public Procedure
 			Object *arg = *it;
 			if (arg->type != &Number_Type)
 			{
-				throw std::exception("Arguments not addable");
+				throw std::runtime_error("Arguments not addable");
 			}
 			Number *num = (Number *)arg;
 			sum += num->value;
@@ -75,13 +75,13 @@ struct Subtract : public Procedure
 		if (args.size() == 1)
 		{
 			if (!args[0]->type->is_numeric)
-				throw std::exception("Can't negate non-numeric type");
+				throw std::runtime_error("Can't negate non-numeric type");
 			Number *num = (Number *)args[0];
 			return new Number(-(num->value));
 		}
 
 		if (!args[0]->type->is_numeric)
-			throw std::exception("Can't subtract from non-numeric type");
+			throw std::runtime_error("Can't subtract from non-numeric type");
 		Number *num = (Number *)args[0];
 
 		long value = num->value;
@@ -91,7 +91,7 @@ struct Subtract : public Procedure
 			Object *arg = args[i];
 			if (!arg->type->is_numeric)
 			{
-				throw std::exception("Can't subtract non-numeric type");
+				throw std::runtime_error("Can't subtract non-numeric type");
 			}
 			Number *num = (Number *)arg;
 			value -= num->value;
@@ -113,7 +113,7 @@ struct Multiply : public Procedure
 			Object *arg = *it;
 			if (arg->type != &Number_Type)
 			{
-				throw std::exception("Arguments not addable");
+				throw std::runtime_error("Arguments not addable");
 			}
 			Number *num = (Number *)arg;
 			product *= num->value;
@@ -130,12 +130,12 @@ struct Divide : public Procedure
 		if (!args[0]->type->is_numeric ||
 			!args[1]->type->is_numeric)
 		{
-			throw std::exception("Arguments must be numeric");
+			throw std::runtime_error("Arguments must be numeric");
 		}
 		Number *a = (Number *)args[0];
 		Number *b = (Number *)args[1];
 		if (b->value == 0)
-			throw std::exception("Divide by zero");
+			throw std::runtime_error("Divide by zero");
 		return new Number(a->value / b->value);
 	}
 };
@@ -149,7 +149,7 @@ struct Equal : public Procedure
 		Object *arg0 = args[0];
 		// for now
 		if (!arg0->type->is_numeric)
-			throw std::exception("= only for numeric types");
+			throw std::runtime_error("= only for numeric types");
 		Number *a = (Number *)arg0;
 		long val = a->value;
 
@@ -157,7 +157,7 @@ struct Equal : public Procedure
 		{
 			Object *arg = args[i];
 			if (!arg->type->is_numeric)
-				throw std::exception("= only for numeric types");
+				throw std::runtime_error("= only for numeric types");
 			Number *b = (Number *)arg;
 			if (b->value != val)
 				return new Boolean(false);
@@ -174,7 +174,7 @@ struct Not : public Procedure
 		require_exactly<1>(args);
 		Object *arg = args[0];
 		if (arg->type != &Boolean_Type)
-			throw std::exception("not is only for boolean");
+			throw std::runtime_error("not is only for boolean");
 		Boolean *b = (Boolean *)arg;
 		return new Boolean(!(b->value));
 	}
@@ -190,7 +190,7 @@ struct And : public Procedure
 		if (args[0]->type != &Boolean_Type ||
 			args[1]->type != &Boolean_Type)
 		{
-			throw std::exception("Arguments must be boolean");
+			throw std::runtime_error("Arguments must be boolean");
 		}
 		Boolean *a = (Boolean *)args[0];
 		Boolean *b = (Boolean *)args[1];
@@ -208,7 +208,7 @@ struct Or : public Procedure
 		if (args[0]->type != &Boolean_Type ||
 			args[1]->type != &Boolean_Type)
 		{
-			throw std::exception("Arguments must be boolean");
+			throw std::runtime_error("Arguments must be boolean");
 		}
 		Boolean *a = (Boolean *)args[0];
 		Boolean *b = (Boolean *)args[1];
@@ -226,7 +226,7 @@ struct Greater : public Procedure
 		if (!args[0]->type->is_numeric ||
 			!args[1]->type->is_numeric)
 		{
-			throw std::exception("Arguments must be numeric");
+			throw std::runtime_error("Arguments must be numeric");
 		}
 		Number *a = (Number *)args[0];
 		Number *b = (Number *)args[1];
@@ -251,7 +251,7 @@ struct Car : public Procedure
 	{
 		require_exactly<1>(args);
 		if (args[0]->type != &Pair_Type)
-			throw std::exception("Argument to car must be a pair");
+			throw std::runtime_error("Argument to car must be a pair");
 		Pair *p = (Pair *)args[0];
 		return p->car;
 	}
@@ -264,7 +264,7 @@ struct Cdr : public Procedure
 	{
 		require_exactly<1>(args);
 		if (args[0]->type != &Pair_Type)
-			throw std::exception("Argument to cdr must be a pair");
+			throw std::runtime_error("Argument to cdr must be a pair");
 		Pair *p = (Pair *)args[0];
 		return p->cdr;
 	}

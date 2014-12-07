@@ -9,7 +9,7 @@
 
 Environment global(nullptr);
 
-char *initialize[] =
+char const *initialize[] =
 {
 	"(define != (lambda (a b) (not (= a b))))",
 	"(define < (lambda (a b) (> b a)))",
@@ -38,7 +38,7 @@ int main()
 	BUILTIN(symbol?, IsSymbol);
 	BUILTIN(null?, IsNull);
 
-	for (char **expr = initialize; *expr != nullptr; ++expr)
+	for (char const **expr = initialize; *expr != nullptr; ++expr)
 	{
 		std::string line(*expr);
 		eval(parse(line), &global);
@@ -50,8 +50,13 @@ int main()
 		try
 		{
 			std::getline(std::cin, line);
+			if (line == "q" || line == "quit" || line == "(quit)") {
+				return 0;
+			}
 			Object *val = eval(parse(line), &global);
-			std::cout << to_string(val) << std::endl;
+			if (val != &define_sentinel) {
+				std::cout << to_string(val) << std::endl;
+			}
 		}
 		catch (std::exception &e)
 		{

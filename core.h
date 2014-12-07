@@ -44,7 +44,7 @@ struct Environment
 		if (parent == nullptr)
 		{
 			std::string message = "Unbound variable: " + s;
-			throw std::exception(message.c_str());
+			throw std::runtime_error(message.c_str());
 		}
 		return parent->lookup(s);
 	}

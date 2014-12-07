@@ -4,6 +4,8 @@
 #include "types.h"
 #include "builtins.h"
 
+Object define_sentinel(nullptr);
+
 Object *eval(Object *x, Environment *env)
 {
 	if (x == nullptr)
@@ -26,11 +28,11 @@ Object *eval(Object *x, Environment *env)
 	if (first->type == &Pair_Type)
 	{
 		// ????
-		throw std::exception("I don't understand what to do here yet");
+		throw std::runtime_error("I don't understand what to do here yet");
 	}
 	if (first->type == &Number_Type)
 	{
-		throw std::exception("Number isn't callable");
+		throw std::runtime_error("Number isn't callable");
 	}
 	if (first->type == &Symbol_Type)
 	{
@@ -67,7 +69,7 @@ Object *eval(Object *x, Environment *env)
 		{
 			Object *name = cell->list_ref(1);
 			if (name->type != &Symbol_Type)
-				throw std::exception("Invalid set!");
+				throw std::runtime_error("Invalid set!");
 			Symbol *setee = (Symbol *)name;
 			Object *value = cell->list_ref(2);
 			env->set(setee->name, value);
@@ -77,17 +79,17 @@ Object *eval(Object *x, Environment *env)
 		{
 			Object *name = cell->list_ref(1);
 			if (name->type != &Symbol_Type)
-				throw std::exception("Invalid set!");
+				throw std::runtime_error("Invalid set!");
 			Symbol *assignee = (Symbol *)name;
 			Object *value = eval(cell->list_ref(2), env);
 			env->set(assignee->name, value);
-			return nullptr;
+			return &define_sentinel;
 		}		
 		if (name == "lambda")
 		{
 			Object *argNames = cell->list_ref(1);
 			if (argNames->type != &Pair_Type)
-				throw std::exception("Bad lambda");
+				throw std::runtime_error("Bad lambda");
 			Object *expression = cell->list_ref(2);
 			return new Lambda((Pair *)argNames, expression, env);
 		}
@@ -113,7 +115,7 @@ Object *eval(Object *x, Environment *env)
 		{
 			if (recurser->cdr->type != &Pair_Type)
 			{
-				throw std::exception("I think this means a parsing error");
+				throw std::runtime_error("I think this means a parsing error");
 			}
 			recurser = (Pair *)recurser->cdr;
 			Object *evald = eval(recurser->car, env);
@@ -121,12 +123,12 @@ Object *eval(Object *x, Environment *env)
 		}
 		if (args[0]->type != &Procedure_Type)
 		{
-			throw std::exception("Not callable");
+			throw std::runtime_error("Not callable");
 		}
 		Procedure *proc = (Procedure *)args[0];
 		args.erase(args.begin());
 		return proc->evaluate(args);
 	}
 
-	throw std::exception("Missed something");
+	throw std::runtime_error("Missed something");
 }

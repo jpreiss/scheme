@@ -48,8 +48,8 @@ struct Pair : public Object
 	Object *list_ref(int i)
 	{
 		if (i == 0) return car;
-		if (cdr == nullptr) throw std::exception("Out of bounds");
-		if (cdr->type != &Pair_Type) throw std::exception("Not a list");
+		if (cdr == nullptr) throw std::runtime_error("Out of bounds");
+		if (cdr->type != &Pair_Type) throw std::runtime_error("Not a list");
 		Pair *next = (Pair *)cdr;
 		return next->list_ref(i - 1);
 	}

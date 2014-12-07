@@ -67,7 +67,7 @@ Object *read_from(std::deque<std::string> &tokens)
 {
 	if (tokens.empty())
 	{
-		throw std::exception("Unexpected EOF while reading");
+		throw std::runtime_error("Unexpected EOF while reading");
 	}
 	
 	std::string token = tokens.front();
@@ -88,7 +88,7 @@ Object *read_from(std::deque<std::string> &tokens)
 	}
 	if (token == ")")
 	{
-		throw std::exception("Unexpected )");
+		throw std::runtime_error("Unexpected )");
 	}
 	// otherwise, atom
 	return atom(token);
